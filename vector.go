@@ -6,6 +6,10 @@ type Vector struct {
 	X, Y, Z float64
 }
 
+var (
+	Up = Vector{Y: 1.0}
+)
+
 func (v Vector) Scale(f float64) Vector {
 	return Vector{v.X * f, v.Y * f, v.Z * f}
 }

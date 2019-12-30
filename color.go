@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"image/color"
 	"math"
 )
 
@@ -25,6 +26,13 @@ func (c Color) Mult(c2 Color) Color {
 
 func (c Color) Add(c2 Color) Color {
 	return Color{c.R + c2.R, c.G + c2.G, c.B + c2.B}
+}
+
+func (c Color) asRGBA() color.RGBA {
+	r := uint8(math.Min(255.0, c.R*255.99))
+	g := uint8(math.Min(255.0, c.G*255.99))
+	b := uint8(math.Min(255.0, c.B*255.99))
+	return color.RGBA{r, g, b, 255}
 }
 
 func (c Color) String() string {
