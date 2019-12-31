@@ -1,5 +1,5 @@
 # goraytracing
-Raytracing in a weekend port to go. Following my c++ and kotlin implementations, this time tried out [golang](https://golang.org/) and it's pretty awesome for concurrency things...
+Raytracing in a weekend port to go. Following my [c++](https://github.com/mehrmann/raytracing) and [kotlin](https://github.com/mehrmann/kraytracing) implementations, this time tried out [golang](https://golang.org/) and it's pretty awesome for concurrency things...
 
 [![Build Status](https://travis-ci.com/mehrmann/goraytracing.svg?branch=master)](https://travis-ci.com/mehrmann/goraytracing)
 
