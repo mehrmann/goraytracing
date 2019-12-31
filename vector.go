@@ -1,6 +1,9 @@
 package main
 
-import "math"
+import (
+	"fmt"
+	"math"
+)
 
 type Vector struct {
 	X, Y, Z float64
@@ -40,6 +43,10 @@ func (v Vector) MakeUnitVector() Vector {
 
 func (v Vector) Negate() Vector {
 	return Vector{-v.X, -v.Y, -v.Z}
+}
+
+func (v Vector) String() string {
+	return fmt.Sprintf("{%f,%f,%f}", v.X, v.Y, v.Z)
 }
 
 func Dot(a Vector, b Vector) float64 {
