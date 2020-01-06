@@ -7,6 +7,8 @@ Raytracing in a weekend port to go. Following my [c++](https://github.com/mehrma
 ![world_1](world_1.png)
 ![world_2](world_2.png)
 ![world_3](world_3.png)
+![world_4](world_4.png)
+![world_5](world_5.png)
 
 # Usage
 Build using
