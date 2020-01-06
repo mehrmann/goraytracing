@@ -5,11 +5,11 @@ type Material interface {
 }
 
 type Lambert struct {
-	albedo Color
+	albedo Texture
 }
 
 type Metal struct {
-	albedo Color
+	albedo Texture
 	fuzz   float64
 }
 
@@ -17,19 +17,28 @@ type Dielectric struct {
 	ri float64
 }
 
+type UVColor struct {
+}
+
+type Checker struct {
+	light Texture
+	dark  Texture
+	size  float64
+}
+
 func (mat Lambert) scatter(ray *Ray, hit *Hit) (bool, *Color, *Ray) {
 	target := hit.p.Add(hit.normal).Add(randomInUnitSphere(ray.rnd))
 	scattered := &Ray{hit.p, target.Sub(hit.p), ray.rnd}
-	attenuation := &mat.albedo
-	return true, attenuation, scattered
+	attenuation := mat.albedo.texture(hit.u, hit.v, hit.p)
+	return true, &attenuation, scattered
 }
 
 func (mat Metal) scatter(ray *Ray, hit *Hit) (bool, *Color, *Ray) {
 	reflected := reflect(ray.Direction.MakeUnitVector(), hit.normal)
 	scattered := &Ray{hit.p, reflected, ray.rnd}
-	attenuation := &mat.albedo
+	attenuation := mat.albedo.texture(hit.u, hit.v, hit.p)
 	if Dot(scattered.Direction, hit.normal) > 0 {
-		return true, attenuation, scattered
+		return true, &attenuation, scattered
 	}
 	return false, nil, nil
 }
@@ -65,4 +74,22 @@ func (mat Dielectric) scatter(ray *Ray, hit *Hit) (bool, *Color, *Ray) {
 		scattered = Ray{hit.p, refracted, ray.rnd}
 	}
 	return true, &White, &scattered
+}
+
+func (mat UVColor) scatter(ray *Ray, hit *Hit) (bool, *Color, *Ray) {
+	target := hit.p.Add(hit.normal).Add(randomInUnitSphere(ray.rnd))
+	scattered := &Ray{hit.p, target.Sub(hit.p), ray.rnd}
+	attenuation := &Color{R: hit.u, B: hit.v}
+	return true, attenuation, scattered
+}
+
+func (mat Checker) scatter(ray *Ray, hit *Hit) (bool, *Color, *Ray) {
+	target := hit.p.Add(hit.normal).Add(randomInUnitSphere(ray.rnd))
+	scattered := &Ray{hit.p, target.Sub(hit.p), ray.rnd}
+	chess := (hit.u * mat.size) + (hit.v * mat.size)
+	attenuation := mat.light.texture(hit.u, hit.v, hit.p)
+	if int(chess)%2 == 0 {
+		attenuation = mat.dark.texture(hit.u, hit.v, hit.p)
+	}
+	return true, &attenuation, scattered
 }

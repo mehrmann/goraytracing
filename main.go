@@ -9,6 +9,8 @@ import (
 	"math/rand"
 	"os"
 	"runtime"
+
+	"github.com/cheggaaa/pb/v3"
 )
 
 type Options struct {
@@ -33,8 +35,26 @@ func buildWorldChapter7(width int, height int) (Camera, ObjectList) {
 	camera := MakeCamera(lookFrom, lookAt, Up, 20, float64(width)/float64(height), aperture, distToFocus)
 
 	world := ObjectList{
-		Sphere{center: Vector{Z: -1.0}, radius: 0.5, material: Lambert{Color{R: 1.0}}},
-		Sphere{center: Vector{Y: -100.5, Z: -1.0}, radius: 100, material: Lambert{Color{G: 1.0}}},
+		Sphere{center: Vector{Z: -1.0}, radius: 0.5, material: Lambert{ConstantTexture{Color{R: 1.0}}}},
+		Sphere{center: Vector{Y: -100.5, Z: -1.0}, radius: 100, material: Lambert{ConstantTexture{Color{G: 1.0}}}},
+	}
+	return camera, world
+}
+
+func buildWorldPlanes(width int, height int) (Camera, ObjectList) {
+	lookFrom := Vector{0, 0.0, 3.0}
+	lookAt := Vector{Z: -1.0}
+	aperture := 0.0
+	distToFocus := 2.0
+	camera := MakeCamera(lookFrom, lookAt, Up, 20, float64(width)/float64(height), aperture, distToFocus)
+
+	world := ObjectList{
+		Sphere{center: Vector{Z: -1.0}, radius: 0.5, material: Lambert{ImageTexture{LoadImage("earth.png")}}},
+		//Sphere{center: Vector{Z: -1.0}, radius: 0.5, material: Dielectric{1.5}},
+		//Sphere{center: Vector{Z: -1.0}, radius: 0.4, material: Dielectric{1.5}},
+		Sphere{center: Vector{Y: -100.5, Z: -1.0}, radius: 100, material: Lambert{CheckerTexture{ConstantTexture{White}, ConstantTexture{Black}, 0.2}}},
+		Plane{center: Vector{Z: -2.0}, normal: Vector{Z: -1.0, X: -1.0}.MakeUnitVector(), material: Lambert{ConstantTexture{Color{R: 1.0}}}},
+		Plane{center: Vector{Z: -2.0}, normal: Vector{Z: -1.0, X: 1.0}.MakeUnitVector(), material: Lambert{ConstantTexture{Color{B: 1.0}}}},
 	}
 	return camera, world
 }
@@ -47,10 +67,10 @@ func buildWorldMetalSpheres(width, height int) (Camera, ObjectList) {
 	camera := MakeCamera(lookFrom, lookAt, Up, 20, float64(width)/float64(height), aperture, distToFocus)
 
 	world := ObjectList{
-		Sphere{center: Vector{Z: -1.0}, radius: 0.5, material: Lambert{Color{R: 0.8, G: 0.3, B: 0.3}}},
-		Sphere{center: Vector{Y: -100.5, Z: -1.0}, radius: 100, material: Lambert{Color{R: 0.8, G: 0.8}}},
-		Sphere{center: Vector{X: 1.0, Y: 0, Z: -1.0}, radius: 0.5, material: Metal{Color{R: 0.8, G: 0.6, B: 0.2}, 1.0}},
-		Sphere{center: Vector{X: -1.0, Y: 0, Z: -1.0}, radius: 0.5, material: Metal{Color{R: 0.8, G: 0.8, B: 0.8}, 0.3}},
+		Sphere{center: Vector{Z: -1.0}, radius: 0.5, material: Lambert{ConstantTexture{Color{R: 0.8, G: 0.3, B: 0.3}}}},
+		Sphere{center: Vector{Y: -100.5, Z: -1.0}, radius: 100, material: Lambert{ConstantTexture{Color{R: 0.8, G: 0.8}}}},
+		Sphere{center: Vector{X: 1.0, Y: 0, Z: -1.0}, radius: 0.5, material: Metal{ConstantTexture{Color{R: 0.8, G: 0.6, B: 0.2}}, 1.0}},
+		Sphere{center: Vector{X: -1.0, Y: 0, Z: -1.0}, radius: 0.5, material: Metal{ConstantTexture{Color{R: 0.8, G: 0.8, B: 0.8}}, 0.3}},
 	}
 
 	return camera, world
@@ -64,9 +84,9 @@ func buildWorldDielectrics(width, height int) (Camera, ObjectList) {
 	camera := MakeCamera(lookFrom, lookAt, Up, 20, float64(width)/float64(height), aperture, distToFocus)
 
 	world := ObjectList{
-		Sphere{center: Vector{Z: -1.0}, radius: 0.5, material: Lambert{Color{R: 0.1, G: 0.2, B: 0.5}}},
-		Sphere{center: Vector{Y: -100.5, Z: -1.0}, radius: 100, material: Lambert{Color{R: 0.8, G: 0.8}}},
-		Sphere{center: Vector{X: 1.0, Y: 0, Z: -1.0}, radius: 0.5, material: Metal{Color{R: 0.8, G: 0.6, B: 0.2}, 1.0}},
+		Sphere{center: Vector{Z: -1.0}, radius: 0.5, material: Lambert{ConstantTexture{Color{R: 0.1, G: 0.2, B: 0.5}}}},
+		Sphere{center: Vector{Y: -100.5, Z: -1.0}, radius: 100, material: Lambert{CheckerTexture{ConstantTexture{White}, ConstantTexture{Black}, 0.2}}},
+		Sphere{center: Vector{X: 1.0, Y: 0, Z: -1.0}, radius: 0.5, material: Metal{ConstantTexture{Color{R: 0.8, G: 0.6, B: 0.2}}, 1.0}},
 		Sphere{center: Vector{X: -1.0, Y: 0, Z: -1.0}, radius: 0.5, material: Dielectric{1.5}},
 		Sphere{center: Vector{X: -1.0, Y: 0, Z: -1.0}, radius: -0.45, material: Dielectric{1.5}},
 	}
@@ -78,8 +98,8 @@ func buildWorldOneWeekend(width, height int) (Camera, ObjectList) {
 	world := ObjectList{}
 
 	maxSpheres := 500
-	world = append(world, Sphere{center: Vector{Y: -1000.0}, radius: 1000, material: Lambert{Color{0.5, 0.5, 0.5}}})
-
+	world = append(world, Sphere{center: Vector{Y: -1000.0}, radius: 1000, material: Lambert{CheckerTexture{ConstantTexture{White}, ConstantTexture{Black}, 0.2}}})
+	Earth := ImageTexture{LoadImage("earth.png")}
 	for a := -11; a < 11 && len(world) < maxSpheres; a++ {
 		for b := -11; b < 11 && len(world) < maxSpheres; b++ {
 			chooseMaterial := rand.Float64()
@@ -87,18 +107,25 @@ func buildWorldOneWeekend(width, height int) (Camera, ObjectList) {
 
 			if center.Sub(Vector{4.0, 0.2, 0}).Length() > 0.9 {
 				switch {
-				case chooseMaterial < 0.8: // diffuse
+
+				case chooseMaterial < 0.7: // diffuse
 					world = append(world,
 						Sphere{
 							center:   center,
 							radius:   0.2,
-							material: Lambert{Color{R: rand.Float64() * rand.Float64(), G: rand.Float64() * rand.Float64(), B: rand.Float64() * rand.Float64()}}})
-				case chooseMaterial < 0.95: // metal
+							material: Lambert{ConstantTexture{Color{R: rand.Float64() * rand.Float64(), G: rand.Float64() * rand.Float64(), B: rand.Float64() * rand.Float64()}}}})
+				case chooseMaterial < 0.8: // metal
 					world = append(world,
 						Sphere{
 							center:   center,
 							radius:   0.2,
-							material: Metal{Color{R: 0.5 * (1 + rand.Float64()), G: 0.5 * (1 + rand.Float64()), B: 0.5 * (1 + rand.Float64())}, 0.5 * rand.Float64()}})
+							material: Metal{ConstantTexture{Color{R: 0.5 * (1 + rand.Float64()), G: 0.5 * (1 + rand.Float64()), B: 0.5 * (1 + rand.Float64())}}, 0.5 * rand.Float64()}})
+				case chooseMaterial < 0.90:
+					world = append(world,
+						Sphere{
+							center:   center,
+							radius:   0.2,
+							material: Lambert{Earth}})
 				default:
 					world = append(world,
 						Sphere{
@@ -119,11 +146,15 @@ func buildWorldOneWeekend(width, height int) (Camera, ObjectList) {
 		Sphere{
 			center:   Vector{-4, 1, 0},
 			radius:   1.0,
-			material: Lambert{Color{0.4, 0.2, 0.1}}},
+			material: Lambert{ConstantTexture{Color{0.4, 0.2, 0.1}}}},
 		Sphere{
 			center:   Vector{4, 1, 0},
 			radius:   1.0,
-			material: Metal{Color{0.7, 0.6, 0.5}, 0}})
+			material: Metal{ConstantTexture{Color{0.7, 0.6, 0.5}}, 0}},
+		Sphere{
+			center:   Vector{8, 1, 0},
+			radius:   1.0,
+			material: Lambert{Earth}})
 
 	lookFrom := Vector{13, 2, 3}
 	lookAt := Vector{}
@@ -183,7 +214,8 @@ func main() {
 		WorldBuildFunction{"Chapter 7", buildWorldChapter7},
 		WorldBuildFunction{"Metal", buildWorldMetalSpheres},
 		WorldBuildFunction{"Dieletrics", buildWorldDielectrics},
-		WorldBuildFunction{"OneWeekend", buildWorldOneWeekend}}
+		WorldBuildFunction{"OneWeekend", buildWorldOneWeekend},
+		WorldBuildFunction{"Planes", buildWorldPlanes}}
 
 	flag.IntVar(&options.Width, "w", 800, "width of rendered image")
 	flag.IntVar(&options.Height, "h", 400, "height of rendered Image")
@@ -209,11 +241,13 @@ func main() {
 		go pixelRenderer(jobChannel, resultChannel, quitChannel, options, world, camera)
 	}
 
+	bar := pb.StartNew(options.Height * options.Width)
 	for i := 0; i < options.Threads; i++ {
 		go func() {
 			for {
 				result := <-resultChannel
 				image.SetRGBA(result.x, options.Height-1-result.y, result.color.asRGBA())
+				bar.Increment()
 			}
 		}()
 	}
@@ -231,5 +265,6 @@ func main() {
 	defer outputFile.Close()
 
 	png.Encode(outputFile, image)
+	bar.Finish()
 
 }

@@ -36,23 +36,39 @@ func (s Sphere) hit(ray *Ray, tMin float64, tMax float64) (bool, *Hit) {
 		temp := (-b - math.Sqrt(discriminant)) / a
 		if temp < tMax && temp > tMin {
 			hitPoint := ray.PointAt(temp)
+			normal := hitPoint.Sub(s.center).Scale(1.0 / s.radius)
+			u, v := UVUnitSphere(normal)
 			hr := Hit{
 				t:        temp,
 				p:        hitPoint,
-				normal:   hitPoint.Sub(s.center).Scale(1.0 / s.radius),
+				normal:   normal,
+				u:        u,
+				v:        v,
 				material: s.material}
 			return true, &hr
 		}
 		temp = (-b + math.Sqrt(discriminant)) / a
 		if temp < tMax && temp > tMin {
 			hitPoint := ray.PointAt(temp)
+			normal := hitPoint.Sub(s.center).Scale(1.0 / s.radius)
+			u, v := UVUnitSphere(normal)
 			hr := Hit{
 				t:        temp,
 				p:        hitPoint,
-				normal:   hitPoint.Sub(s.center).Scale(1.0 / s.radius),
+				normal:   normal,
+				u:        u,
+				v:        v,
 				material: s.material}
 			return true, &hr
 		}
 	}
 	return false, nil
+}
+
+func UVUnitSphere(hitPoint Vector) (float64, float64) {
+	phi := math.Atan2(hitPoint.Z, hitPoint.X)
+	theta := math.Asin(hitPoint.Y)
+	u := 1.0 - (phi+math.Pi)/(2.0*math.Pi)
+	v := (theta + math.Pi/2.0) / math.Pi
+	return u, v
 }

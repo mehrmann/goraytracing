@@ -4,6 +4,8 @@ type Hit struct {
 	t        float64
 	p        Vector
 	normal   Vector
+	u        float64
+	v        float64
 	material Material
 }
 

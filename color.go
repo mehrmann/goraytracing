@@ -14,6 +14,9 @@ var (
 	White   = Color{1.0, 1.0, 1.0}
 	Black   = Color{0.0, 0.0, 0.0}
 	SkyBlue = Color{0.5, 0.7, 1.0}
+	Red     = Color{1.0, 0.0, 0.0}
+	Green   = Color{0.0, 1.0, 0.0}
+	Blue    = Color{0.0, 0.0, 1.0}
 )
 
 func (c Color) Scale(f float64) Color {

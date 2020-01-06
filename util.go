@@ -1,7 +1,10 @@
 package main
 
 import (
+	"fmt"
+	"image"
 	"math"
+	"os"
 )
 
 type Rnd interface {
@@ -60,4 +63,15 @@ func min(a, b int) int {
 		return a
 	}
 	return b
+}
+
+func LoadImage(file string) image.Image {
+	imgfile, err := os.Open(file)
+	if err != nil {
+		fmt.Println("file not found!")
+		os.Exit(1)
+	}
+	defer imgfile.Close()
+	img, _, err := image.Decode(imgfile)
+	return img
 }
