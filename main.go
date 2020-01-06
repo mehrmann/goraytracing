@@ -41,6 +41,23 @@ func buildWorldChapter7(width int, height int) (Camera, ObjectList) {
 	return camera, world
 }
 
+func twoPerlinSpheres(width int, height int) (Camera, ObjectList) {
+	lookFrom := Vector{13, 2, 3}
+	lookAt := Vector{}
+	aperture := 0.0
+	distToFocus := 2.0
+	camera := MakeCamera(lookFrom, lookAt, Up, 20, float64(width)/float64(height), aperture, distToFocus)
+	perlin := Perlin()
+	perlinTexture := PerlinTexture{ConstantTexture{AlmostWhite}, ConstantTexture{AlmostBlack}, perlin, Vector{1.0, 0.0, 0.0}, 10, 4}
+	perlinTextureB := PerlinTexture{colorA: ConstantTexture{Green}, colorB: ConstantTexture{Color{0.0, 0.5, 0.0}}, perlin: perlin, scaleV: Vector{0.0, 0, 0.0}, scale: 5, turb: 2.0}
+
+	world := ObjectList{
+		Sphere{center: Vector{0, 2, 0}, radius: 2, material: Lambert{perlinTexture}},
+		Sphere{center: Vector{Y: -1000, Z: -1.0}, radius: 1000, material: Lambert{perlinTextureB}},
+	}
+	return camera, world
+}
+
 func buildWorldPlanes(width int, height int) (Camera, ObjectList) {
 	lookFrom := Vector{0, 0.0, 3.0}
 	lookAt := Vector{Z: -1.0}
@@ -215,7 +232,8 @@ func main() {
 		WorldBuildFunction{"Metal", buildWorldMetalSpheres},
 		WorldBuildFunction{"Dieletrics", buildWorldDielectrics},
 		WorldBuildFunction{"OneWeekend", buildWorldOneWeekend},
-		WorldBuildFunction{"Planes", buildWorldPlanes}}
+		WorldBuildFunction{"Planes", buildWorldPlanes},
+		WorldBuildFunction{"twoPerlinSpheres", twoPerlinSpheres}}
 
 	flag.IntVar(&options.Width, "w", 800, "width of rendered image")
 	flag.IntVar(&options.Height, "h", 400, "height of rendered Image")

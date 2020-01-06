@@ -11,12 +11,14 @@ type Color struct {
 }
 
 var (
-	White   = Color{1.0, 1.0, 1.0}
-	Black   = Color{0.0, 0.0, 0.0}
-	SkyBlue = Color{0.5, 0.7, 1.0}
-	Red     = Color{1.0, 0.0, 0.0}
-	Green   = Color{0.0, 1.0, 0.0}
-	Blue    = Color{0.0, 0.0, 1.0}
+	White       = Color{1.0, 1.0, 1.0}
+	AlmostWhite = Color{0.9, 0.9, 0.9}
+	Black       = Color{0.0, 0.0, 0.0}
+	AlmostBlack = Color{0.1, 0.1, 0.1}
+	SkyBlue     = Color{0.5, 0.7, 1.0}
+	Red         = Color{1.0, 0.0, 0.0}
+	Green       = Color{0.0, 1.0, 0.0}
+	Blue        = Color{0.0, 0.0, 1.0}
 )
 
 func (c Color) Scale(f float64) Color {
@@ -44,4 +46,8 @@ func (c Color) String() string {
 	b := uint32(math.Min(255.0, c.B*255.99))
 
 	return fmt.Sprintf("%d %d %d", r, g, b)
+}
+
+func Lerp(ca, cb Color, t float64) Color {
+	return ca.Scale(t).Add(cb.Scale(1.0 - t))
 }

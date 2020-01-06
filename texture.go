@@ -23,6 +23,15 @@ type CheckerTexture struct {
 	size float64
 }
 
+type PerlinTexture struct {
+	colorA Texture
+	colorB Texture
+	perlin Noise
+	scaleV Vector
+	turb   float64
+	scale  float64
+}
+
 func (c ConstantTexture) texture(u, v float64, p Vector) Color {
 	return c.albedo
 }
@@ -44,4 +53,9 @@ func (c CheckerTexture) texture(u, v float64, p Vector) Color {
 	} else {
 		return c.even.texture(u, v, p)
 	}
+}
+
+func (pt PerlinTexture) texture(u, v float64, p Vector) Color {
+	t := 0.5 * (1 + math.Sin(Dot(pt.scaleV, p)+pt.turb*pt.perlin.turb(p.Scale(pt.scale), 7)))
+	return Lerp(pt.colorA.texture(u, v, p), pt.colorB.texture(u, v, p), t)
 }
